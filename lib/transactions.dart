@@ -27,6 +27,8 @@ class _TransactionsState extends State<Transactions> {
 
   @override
   Widget build(BuildContext context) {
+    final txs = Provider.of<ScrollProvider>(context).transactions;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: ListView(
@@ -34,35 +36,13 @@ class _TransactionsState extends State<Transactions> {
         children: [
           SizedBox(height: 270),
           Text("Transacciones", style: TextStyle(fontSize: 16)),
-          TransactionCard(
-            monto: -2458.65,
-            titulo: "Compra chino",
-            descripcion: "cosas para el asado",
-          ),
-          TransactionCard(
-            monto: 750.0,
-            titulo: "Soporte Andrés H.",
-            descripcion: "Reparación del sonido",
-          ),
-          TransactionCard(
-            monto: -650,
-            titulo: "Compra pantalón",
-            descripcion: "Jogging",
-          ),
-          TransactionCard(
-            monto: -590,
-            titulo: "Combustible Moto",
-            descripcion: "lleno",
-          ),
-          TransactionCard(
-            monto: 12000,
-            titulo: "Soporte Galia",
-            descripcion: "Mensualidad",
-          ),
-          TransactionCard(
-            monto: -6540,
-            titulo: "Compra Estabilizadores",
-            descripcion: "2x Estabilizadores para RIG",
+          ...txs.map(
+            (e) => TransactionCard(
+              id: e.id,
+              monto: e.monto,
+              titulo: e.titulo,
+              descripcion: e.descripcion,
+            ),
           ),
         ],
       ),
@@ -71,12 +51,13 @@ class _TransactionsState extends State<Transactions> {
 }
 
 class TransactionCard extends StatelessWidget {
+  final int id;
   final String titulo;
   final String descripcion;
   final double monto;
 
   const TransactionCard({
-    Key key,
+    this.id,
     @required this.titulo,
     this.descripcion = "",
     @required this.monto,
@@ -85,6 +66,9 @@ class TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
+      onDismissed: (_) {
+        Provider.of<ScrollProvider>(context, listen: false).deleteTX(id);
+      },
       background: Container(
         padding: const EdgeInsets.all(40),
         alignment: Alignment.centerRight,
@@ -193,4 +177,18 @@ class TransactionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class Transaction {
+  final int id;
+  final double monto;
+  final String titulo;
+  final String descripcion;
+
+  Transaction(
+    this.id,
+    this.monto,
+    this.titulo,
+    this.descripcion,
+  );
 }
